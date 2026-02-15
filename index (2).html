@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLACK UNIVERSE // TERMINAL v9.0</title>
+    <style>
+        /* ===== RESET & CORE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #ff0000;
+            font-family: 'Inter', 'Courier New', monospace;
+            overflow-x: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        /* ===== LOADING SCREEN ===== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease;
+        }
+
+        .loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-content {
+            max-width: 600px;
+            padding: 40px;
+            border: 1px solid #ff0000;
+            background: rgba(0, 0, 0, 0.95);
+            box-shadow: 0 0 100px rgba(255, 0, 0, 0.2);
+        }
+
+        .loading-header {
+            font-size: 14px;
+            color: #ff0000;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            opacity: 0.7;
+        }
+
+        .loading-title {
+            font-size: 32px;
+            color: #ff0000;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            font-weight: 400;
+        }
+
+        .loading-title::after {
+            content: '_';
+            animation: cursorBlink 1s infinite;
+        }
+
+        @keyframes cursorBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .progress-bar {
+            height: 2px;
+            background: transparent;
+            border: 1px solid #ff0000;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #ff0000;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 20px #ff0000;
+        }
+
+        .progress-status {
+            font-size: 12px;
+            color: #ff0000;
+            opacity: 0.6;
+            margin-bottom: 20px;
+        }
+
+        .loading-messages {
+            font-size: 13px;
+            color: #ff0000;
+            min-height: 60px;
+            border-top: 1px solid rgba(255, 0, 0, 0.3);
+            padding-top: 20px;
+            font-style: italic;
+        }
+
+        /* ===== LOGIN PAGE ===== */
+        .login-page {
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000000;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            border: 1px solid #ff0000;
+            background: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 0 100px rgba(255, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-title {
+            font-size: 24px;
+            color: #ff0000;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .login-subtitle {
+            font-size: 12px;
+            color: #ff0000;
+            opacity: 0.5;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            color: #ff0000;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #ff0000;
+            padding: 12px 0;
+            color: #ff0000;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-bottom-color: #ff3333;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 1px solid #ff0000;
+            color: #ff0000;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .login-button:hover {
+            background: #ff0000;
+            color: #000000;
+        }
+
+        .error-message {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #ff0000;
+            text-align: center;
+            min-height: 20px;
+        }
+
+        .hint-box {
+            margin-top: 30px;
+            padding: 15px;
+            border: 1px dashed rgba(255, 0, 0, 0.3);
+            font-size: 11px;
+            color: #ff0000;
+            opacity: 0.5;
+        }
+
+        /* ===== PROFILE PAGE ===== */
+        .profile-page {
+            position: relative;
+            min-height: 100vh;
+            width: 100vw;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+            color: #ffffff;
+            overflow-y: auto;
+            display: none;
+            scroll-behavior: smooth;
+        }
+
+        .profile-page.active {
+            display: block;
+        }
+
+        /* Custom Scrollbar */
+        .profile-page::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .profile-page::-webkit-scrollbar-track {
+            background: #0a0a0f;
+        }
+
+        .profile-page::-webkit-scrollbar-thumb {
+            background: #ff0000;
+            border-radius: 5px;
+        }
+
+        .profile-page::-webkit-scrollbar-thumb:hover {
+            background: #ff3333;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid #ff0000;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff0000;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            cursor: pointer;
+        }
+
+        .nav-items {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+
+        .nav-item:hover {
+            color: #ff0000;
+        }
+
+        .nav-item.active {
+            color: #ff0000;
+            border-bottom: 2px solid #ff0000;
+        }
+
+        .logout-nav {
+            padding: 8px 20px;
+            border: 1px solid #ff0000;
+            color: #ff0000;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-nav:hover {
+            background: #ff0000;
+            color: #000000;
+        }
+
+        .time-display {
+            color: #ff0000;
+            margin-left: 20px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            padding: 60px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, rgba(255,0,0,0.1) 0%, transparent 100%);
+        }
+
+        .welcome-text h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .welcome-text h1 span {
+            color: #ff0000;
+        }
+
+        .welcome-text p {
+            font-size: 18px;
+            color: #888;
+        }
+
+        .stats-quick {
+            display: flex;
+            gap: 40px;
+        }
+
+        .stat-quick-item {
+            text-align: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .stat-quick-item:hover {
+            background: rgba(255, 0, 0, 0.1);
+            transform: scale(1.05);
+        }
+
+        .stat-quick-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ff0000;
+        }
+
+        .stat-quick-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            padding: 20px 40px 60px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #ffffff;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            border-left: 4px solid #ff0000;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            border-color: #ff0000;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 0, 0, 0.2);
+        }
+
+        .card-header i {
+            color: #ff0000;
+            font-size: 20px;
+        }
+
+        .card-header h3 {
+            color: #ffffff;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Info Lists */
+        .info-list {
+            list-style: none;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .info-label {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .info-value {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .info-value.red {
+            color: #ff0000;
+        }
+
+        /* Timeline */
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            position: relative;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .timeline-item:hover {
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            background: #ff0000;
+            border-radius: 50%;
+            margin-top: 5px;
+            box-shadow: 0 0 15px #ff0000;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-date {
+            font-size: 14px;
+            color: #ff0000;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .timeline-title {
+            font-size: 16px;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .timeline-desc {
+            font-size: 13px;
+            color: #888;
+            line-height: 1.6;
+        }
+
+        /* Skills */
+        .skills-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .skill-tag {
+            padding: 8px 16px;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 25px;
+            color: #ffffff;
+            font-size: 13px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .skill-tag:hover {
+            background: #ff0000;
+            border-color: #ff0000;
+            transform: scale(1.05);
+            color: #000000;
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #ff0000;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Terminal */
+        .terminal-card {
+            background: #0a0a0f;
+            border: 1px solid #ff0000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .terminal-header {
+            padding: 12px 20px;
+            background: rgba(255, 0, 0, 0.1);
+            border-bottom: 1px solid #ff0000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff0000;
+        }
+
+        .terminal-title {
+            color: #ff0000;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .terminal-line {
+            color: #00ff00;
+            margin-bottom: 10px;
+        }
+
+        .terminal-output {
+            color: #ffffff;
+            margin-left: 20px;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .terminal-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background: #00ff00;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a2e;
+            border: 2px solid #ff0000;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #ff0000;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            color: #ff0000;
+            margin-bottom: 20px;
+        }
+
+        .modal-text {
+            color: #ffffff;
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a1a2e;
+            border: 1px solid #ff0000;
+            padding: 15px 25px;
+            color: #ffffff;
+            border-radius: 8px;
+            z-index: 10000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .toast-notification.show {
+            transform: translateX(0);
+        }
+        
+        .toast-notification.success {
+            border-left: 4px solid #00ff00;
+        }
+        
+        .toast-notification.error {
+            border-left: 4px solid #ff0000;
+        }
+
+        /* User badges */
+        .dann-badge, .serafim-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 15px;
+        }
+
+        .dann-badge {
+            background: #ff0000;
+            color: #000000;
+        }
+
+        .serafim-badge {
+            background: #ff69b4;
+            color: #000000;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-header">BLACK UNIVERSE // v9.0 FINAL</div>
+            <div class="loading-title">INITIALIZING</div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-status" id="progressStatus">0%</div>
+            
+            <div class="loading-messages" id="loadingMessages">
+                <div>Establishing secure connection...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Page -->
+    <div class="login-page" id="loginPage">
+        <div class="login-container">
+            <div class="login-title">BLACK UNIVERSE</div>
+            <div class="login-subtitle">SECURE ACCESS PORTAL</div>
+            
+            <div class="input-group">
+                <label>USERNAME</label>
+                <input type="text" id="username" placeholder="Enter credentials..." autocomplete="off">
+            </div>
+            
+            <div class="input-group">
+                <label>PASSWORD</label>
+                <input type="password" id="password" placeholder="Enter key..." autocomplete="off">
+            </div>
+            
+            <button class="login-button" onclick="login()">AUTHENTICATE</button>
+            
+            <div class="error-message" id="errorMsg"></div>
+            
+            <div class="hint-box">
+                <div>Dann Keren / Dann Sigma</div>
+                <div style="margin-top: 8px;">Serafim / MyBini</div>
+                <div style="margin-top: 15px; color: #ff6666;">🔐 Press Ctrl+H for help</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-notification" id="toast">✅ Action completed successfully</div>
+
+    <!-- Modal untuk Detail -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="modal-text" id="modalText"></div>
+        </div>
+    </div>
+
+    <!-- Profile Page - Dann -->
+    <div class="profile-page" id="dannProfile">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="logo" onclick="scrollToTop()">BLACK UNIVERSE <span class="dann-badge">ELITE</span></div>
+            <div class="nav-items">
+                <div class="nav-item active" onclick="showSection('dashboard', event)">Dashboard</div>
+                <div class="nav-item" onclick="showSection('analytics', event)">Analytics</div>
+                <div class="nav-item" onclick="showSection('reports', event)">Reports</div>
+                <div class="nav-item" onclick="showSection('settings', event)">Settings</div>
+                <div class="time-display" id="timeDisplay"></div>
+                <div class="logout-nav" onclick="logout()">LOGOUT</div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="welcome-text">
+                <h1>Welcome back, <span>Dann</span></h1>
+                <p>Security Engineer • Level 5 Clearance</p>
+            </div>
+            <div class="stats-quick">
+                <div class="stat-quick-item" onclick="showStatDetail('operations')">
+                    <div class="stat-quick-value">1337</div>
+                    <div class="stat-quick-label">OPERATIONS</div>
+                </div>
+                <div class="stat-quick-item" onclick="showStatDetail('systems')">
+                    <div class="stat-quick-value">500+</div>
+                    <div class="stat-quick-label">SYSTEMS</div>
+                </div>
+                <div class="stat-quick-item" onclick="showStatDetail('age')">
+                    <div class="stat-quick-value">14</div>
+                    <div class="stat-quick-label">AGE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard" id="dashboardSection">
+            <!-- Stats Row -->
+            <div class="grid-4">
+                <div class="card stat-card" onclick="showStatDetail('experience')">
+                    <div class="stat-number">5+</div>
+                    <div class="stat-label">YEARS EXPERIENCE</div>
+                </div>
+                <div class="card stat-card" onclick="showStatDetail('vulnerabilities')">
+                    <div class="stat-number">200+</div>
+                    <div class="stat-label">VULNERABILITIES</div>
+                </div>
+                <div class="card stat-card" onclick="showStatDetail('success')">
+                    <div class="stat-number">99.9%</div>
+                    <div class="stat-label">SUCCESS RATE</div>
+                </div>
+                <div class="card stat-card" onclick="showStatDetail('rank')">
+                    <div class="stat-number">#1</div>
+                    <div class="stat-label">INDONESIA RANK</div>
+                </div>
+            </div>
+
+            <!-- Profile Grid -->
+            <div class="grid-2">
+                <!-- Personal Info -->
+                <div class="card" onclick="showDetail('personal')">
+                    <div class="card-header">
+                        <i>👤</i>
+                        <h3>Personal Information</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li class="info-item">
+                            <span class="info-label">Full Name</span>
+                            <span class="info-value">Dann</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Age</span>
+                            <span class="info-value">14 years old</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Location</span>
+                            <span class="info-value">Jakarta, Indonesia</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Status</span>
+                            <span class="info-value red">ACTIVE</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Member Since</span>
+                            <span class="info-value">2020</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Professional Info -->
+                <div class="card" onclick="showDetail('professional')">
+                    <div class="card-header">
+                        <i>💼</i>
+                        <h3>Professional</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li class="info-item">
+                            <span class="info-label">Role</span>
+                            <span class="info-value">Security Engineer</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Company</span>
+                            <span class="info-value">Black Universe</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Experience</span>
+                            <span class="info-value">5+ Years</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Clearance</span>
+                            <span class="info-value red">Level 5</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Rank</span>
+                            <span class="info-value">Elite Member</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Timeline -->
+                <div class="card">
+                    <div class="card-header">
+                        <i>📅</i>
+                        <h3>Career Timeline</h3>
+                    </div>
+                    <div class="timeline-item" onclick="showTimelineDetail(2024)">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">2024 - Present</div>
+                            <div class="timeline-title">Security Engineer</div>
+                            <div class="timeline-desc">Black Universe • Managing 500+ systems</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item" onclick="showTimelineDetail(2023)">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">2023</div>
+                            <div class="timeline-title">Bug Bounty Hunter</div>
+                            <div class="timeline-desc">Found 200+ vulnerabilities</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item" onclick="showTimelineDetail(2022)">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">2022</div>
+                            <div class="timeline-title">Joined Black Universe</div>
+                            <div class="timeline-desc">Youngest elite member</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item" onclick="showTimelineDetail(2021)">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">2021</div>
+                            <div class="timeline-title">Hackathon Champion</div>
+                            <div class="timeline-desc">National winner at age 11</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="card" onclick="showDetail('achievements')">
+                    <div class="card-header">
+                        <i>🏆</i>
+                        <h3>Achievements</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li class="info-item">
+                            <span class="info-label">2024</span>
+                            <span class="info-value">Security Engineer</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">2023</span>
+                            <span class="info-value">Top 1 Indonesia</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">2022</span>
+                            <span class="info-value">Black Universe Elite</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">2021</span>
+                            <span class="info-value">Hackathon Winner</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">2020</span>
+                            <span class="info-value">Started at 9</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Skills Section -->
+            <div class="card" style="margin-bottom: 40px;" onclick="showDetail('skills')">
+                <div class="card-header">
+                    <i>🔧</i>
+                    <h3>Technical Skills</h3>
+                </div>
+                <div class="skills-cloud">
+                    <span class="skill-tag">Penetration Testing</span>
+                    <span class="skill-tag">Network Security</span>
+                    <span class="skill-tag">Exploit Development</span>
+                    <span class="skill-tag">Reverse Engineering</span>
+                    <span class="skill-tag">Cryptography</span>
+                    <span class="skill-tag">OSINT</span>
+                    <span class="skill-tag">Malware Analysis</span>
+                    <span class="skill-tag">Bug Bounty</span>
+                    <span class="skill-tag">Social Engineering</span>
+                    <span class="skill-tag">CTF Player</span>
+                </div>
+            </div>
+
+            <!-- Terminal -->
+            <div class="terminal-card" onclick="showDetail('terminal')">
+                <div class="terminal-header">
+                    <div class="terminal-dot"></div>
+                    <div class="terminal-title">root@black_universe:~</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line">$ whoami</div>
+                    <div class="terminal-output">Dann • Security Engineer</div>
+                    <div class="terminal-line">$ pwd</div>
+                    <div class="terminal-output">/black-universe/elite/dann</div>
+                    <div class="terminal-line">$ status</div>
+                    <div class="terminal-output">ACTIVE • 1337 operations completed</div>
+                    <div class="terminal-cursor"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section (hidden by default) -->
+        <div class="dashboard" id="analyticsSection" style="display: none;">
+            <h2 class="section-title">Analytics Dashboard</h2>
+            <div class="grid-2">
+                <div class="card" onclick="showDetail('analytics1')">
+                    <div class="card-header">
+                        <i>📊</i>
+                        <h3>System Performance</h3>
+                    </div>
+                    <div style="height: 200px; display: flex; align-items: center; justify-content: center; color: #888;">
+                        📈 CPU: 23% | RAM: 45% | DISK: 67%<br>
+                        Click for details
+                    </div>
+                </div>
+                <div class="card" onclick="showDetail('analytics2')">
+                    <div class="card-header">
+                        <i>📈</i>
+                        <h3>Security Metrics</h3>
+                    </div>
+                    <div style="height: 200px; display: flex; align-items: center; justify-content: center; color: #888;">
+                        🔒 Firewall: ACTIVE | Threats: 0<br>
+                        Click for details
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div class="dashboard" id="reportsSection" style="display: none;">
+            <h2 class="section-title">Security Reports</h2>
+            <div class="grid-2">
+                <div class="card" onclick="showDetail('report1')">
+                    <div class="card-header">
+                        <i>📄</i>
+                        <h3>Monthly Report - February 2026</h3>
+                    </div>
+                    <p style="color: #888;">Operations: 1,337 | Success: 100%</p>
+                </div>
+                <div class="card" onclick="showDetail('report2')">
+                    <div class="card-header">
+                        <i>📄</i>
+                        <h3>Vulnerability Assessment</h3>
+                    </div>
+                    <p style="color: #888;">Critical: 0 | High: 2 | Medium: 5</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="dashboard" id="settingsSection" style="display: none;">
+            <h2 class="section-title">System Settings</h2>
+            <div class="grid-2">
+                <div class="card" onclick="showDetail('settings1')">
+                    <div class="card-header">
+                        <i>⚙️</i>
+                        <h3>Profile Settings</h3>
+                    </div>
+                    <p style="color: #888;">Configure your profile information</p>
+                </div>
+                <div class="card" onclick="showDetail('settings2')">
+                    <div class="card-header">
+                        <i>🔒</i>
+                        <h3>Security Settings</h3>
+                    </div>
+                    <p style="color: #888;">Adjust security preferences</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Page - Serafim -->
+    <div class="profile-page" id="serafimProfile">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="logo" onclick="scrollToTop()">BLACK UNIVERSE <span class="serafim-badge">QUEEN</span></div>
+            <div class="nav-items">
+                <div class="nav-item active" onclick="showSection('dashboard', event)">Dashboard</div>
+                <div class="nav-item" onclick="showSection('analytics', event)">Analytics</div>
+                <div class="time-display" id="timeDisplay2"></div>
+                <div class="logout-nav" onclick="logout()">LOGOUT</div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="welcome-text">
+                <h1>Welcome, <span>Serafim</span></h1>
+                <p>Queen of Black Universe • Special Access</p>
+            </div>
+            <div class="stats-quick">
+                <div class="stat-quick-item" onclick="showStatDetail('access')">
+                    <div class="stat-quick-value">∞</div>
+                    <div class="stat-quick-label">ACCESS</div>
+                </div>
+                <div class="stat-quick-item" onclick="showStatDetail('status')">
+                    <div class="stat-quick-value">👑</div>
+                    <div class="stat-quick-label">STATUS</div>
+                </div>
+                <div class="stat-quick-item" onclick="showStatDetail('rank')">
+                    <div class="stat-quick-value">#1</div>
+                    <div class="stat-quick-label">RANK</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard" id="dashboardSection2">
+            <!-- Stats Row -->
+            <div class="grid-4">
+                <div class="card stat-card" onclick="showStatDetail('clearance')">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">CLEARANCE</div>
+                </div>
+                <div class="card stat-card" onclick="showStatDetail('access2')">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">ACCESS</div>
+                </div>
+                <div class="card stat-card" onclick="showStatDetail('queen')">
+                    <div class="stat-number">👑</div>
+                    <div class="stat-label">QUEEN</div>
+                </div>
+                <div class="card stat-card" onclick="showStatDetail('rank2')">
+                    <div class="stat-number">1</div>
+                    <div class="stat-label">RANK</div>
+                </div>
+            </div>
+
+            <!-- Profile Grid -->
+            <div class="grid-2">
+                <!-- Personal Info -->
+                <div class="card" onclick="showDetail('personal-serafim')">
+                    <div class="card-header">
+                        <i>👸</i>
+                        <h3>Personal Information</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li class="info-item">
+                            <span class="info-label">Name</span>
+                            <span class="info-value">Serafim</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Status</span>
+                            <span class="info-value red">SPECIAL</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Role</span>
+                            <span class="info-value">Queen of BU</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Special Info -->
+                <div class="card" onclick="showDetail('special')">
+                    <div class="card-header">
+                        <i>💕</i>
+                        <h3>Special Access</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li class="info-item">
+                            <span class="info-label">Clearance</span>
+                            <span class="info-value red">INFINITE</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Affiliation</span>
+                            <span class="info-value">Black Universe</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Rank</span>
+                            <span class="info-value">Queen</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Timeline -->
+                <div class="card">
+                    <div class="card-header">
+                        <i>📅</i>
+                        <h3>Timeline</h3>
+                    </div>
+                    <div class="timeline-item" onclick="showTimelineDetail(2024)">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">Present</div>
+                            <div class="timeline-title">Queen of Black Universe</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item" onclick="showTimelineDetail(2023)">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">2024</div>
+                            <div class="timeline-title">Special Access Granted</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="card" onclick="showDetail('achievements-serafim')">
+                    <div class="card-header">
+                        <i>🏆</i>
+                        <h3>Achievements</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li class="info-item">
+                            <span class="info-label">2024</span>
+                            <span class="info-value">Queen Status</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">2023</span>
+                            <span class="info-value">Special Member</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Skills -->
+            <div class="card" style="margin-bottom: 40px;" onclick="showDetail('skills-serafim')">
+                <div class="card-header">
+                    <i>✨</i>
+                    <h3>Special Capabilities</h3>
+                </div>
+                <div class="skills-cloud">
+                    <span class="skill-tag">Infinite Access</span>
+                    <span class="skill-tag">Queen Privileges</span>
+                    <span class="skill-tag">System Control</span>
+                    <span class="skill-tag">Black Universe</span>
+                </div>
+            </div>
+
+            <!-- Terminal -->
+            <div class="terminal-card" onclick="showDetail('terminal-serafim')">
+                <div class="terminal-header">
+                    <div class="terminal-dot"></div>
+                    <div class="terminal-title">queen@black_universe:~</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line">$ whoami</div>
+                    <div class="terminal-output">Serafim • Queen</div>
+                    <div class="terminal-line">$ status</div>
+                    <div class="terminal-output">SPECIAL ACCESS • Infinite clearance</div>
+                    <div class="terminal-cursor"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== LOADING SCREEN ==========
+        const loadingScreen = document.getElementById('loadingScreen');
+        const progressFill = document.getElementById('progressFill');
+        const progressStatus = document.getElementById('progressStatus');
+        const loadingMessages = document.getElementById('loadingMessages');
+        
+        const messages = [
+            "Initializing Black Universe...",
+            "Loading secure protocols...",
+            "Bypassing firewalls...",
+            "Decrypting access...",
+            "Almost there...",
+            "Welcome to Black Universe"
+        ];
+
+        let progress = 0;
+        const loadingInterval = setInterval(() => {
+            progress += Math.random() * 10;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(loadingInterval);
+                setTimeout(() => {
+                    loadingScreen.classList.add('fade-out');
+                }, 500);
+            }
+            
+            progressFill.style.width = progress + '%';
+            progressStatus.innerHTML = Math.floor(progress) + '%';
+            
+            if (Math.random() > 0.8) {
+                const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                loadingMessages.innerHTML = `<div>${randomMsg}</div>`;
+            }
+        }, 200);
+
+        // ========== TOAST NOTIFICATION ==========
+        const toast = document.getElementById('toast');
+        
+        function showToast(message, type = 'success') {
+            toast.innerHTML = message;
+            toast.className = 'toast-notification show ' + type;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ========== MODAL FUNCTIONS ==========
+        const modal = document.getElementById('detailModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalText = document.getElementById('modalText');
+
+        function showModal(title, text) {
+            modalTitle.innerHTML = title;
+            modalText.innerHTML = text;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        // ========== DETAIL FUNCTIONS ==========
+        function showDetail(type) {
+            let title = '';
+            let text = '';
+            
+            switch(type) {
+                // Dann's details
+                case 'personal':
+                    title = 'Personal Information';
+                    text = 'Dann is a 14-year-old security prodigy from Jakarta.\n' +
+                          'Started coding at age 9, now one of the youngest security engineers in Indonesia.\n\n' +
+                          '• Full Name: Dann\n' +
+                          '• Age: 14 years old\n' +
+                          '• Location: Jakarta, Indonesia\n' +
+                          '• Status: ACTIVE\n' +
+                          '• Member Since: 2020';
+                    break;
+                    
+                case 'professional':
+                    title = 'Professional Background';
+                    text = 'Security Engineer at Black Universe with 5+ years of experience.\n\n' +
+                          '• Role: Security Engineer\n' +
+                          '• Company: Black Universe\n' +
+                          '• Experience: 5+ Years\n' +
+                          '• Clearance: Level 5\n' +
+                          '• Rank: Elite Member';
+                    break;
+                    
+                case 'achievements':
+                    title = 'Achievements';
+                    text = '• 2024: Security Engineer at Black Universe\n' +
+                          '• 2023: Top 1 Hacker Indonesia\n' +
+                          '• 2022: Black Universe Elite Member\n' +
+                          '• 2021: National Hackathon Winner\n' +
+                          '• 2020: Started coding at age 9';
+                    break;
+                    
+                case 'skills':
+                    title = 'Technical Skills';
+                    text = 'Penetration Testing\n' +
+                          'Network Security\n' +
+                          'Exploit Development\n' +
+                          'Reverse Engineering\n' +
+                          'Cryptography\n' +
+                          'OSINT\n' +
+                          'Malware Analysis\n' +
+                          'Bug Bounty\n' +
+                          'Social Engineering\n' +
+                          'CTF Player';
+                    break;
+                    
+                case 'terminal':
+                    title = 'Terminal Access';
+                    text = 'You have accessed the Black Universe terminal.\n\n' +
+                          'This interface allows direct system commands and real-time monitoring of security operations.\n\n' +
+                          'Available commands:\n' +
+                          '• whoami - Display current user\n' +
+                          '• pwd - Print working directory\n' +
+                          '• status - Show system status\n' +
+                          '• help - Show available commands';
+                    break;
+                    
+                // Serafim's details
+                case 'personal-serafim':
+                    title = 'Serafim - Personal Information';
+                    text = 'Serafim is the Queen of Black Universe with special access privileges.\n\n' +
+                          '• Name: Serafim\n' +
+                          '• Status: SPECIAL\n' +
+                          '• Role: Queen of Black Universe';
+                    break;
+                    
+                case 'special':
+                    title = 'Special Access';
+                    text = 'Serafim has infinite clearance within the Black Universe system.\n\n' +
+                          '• Clearance: INFINITE\n' +
+                          '• Affiliation: Black Universe\n' +
+                          '• Rank: Queen';
+                    break;
+                    
+                case 'achievements-serafim':
+                    title = 'Serafim - Achievements';
+                    text = '• 2024: Queen Status Granted\n' +
+                          '• 2023: Special Member of Black Universe';
+                    break;
+                    
+                case 'skills-serafim':
+                    title = 'Special Capabilities';
+                    text = 'Infinite Access\n' +
+                          'Queen Privileges\n' +
+                          'System Control\n' +
+                          'Black Universe Administration';
+                    break;
+                    
+                case 'terminal-serafim':
+                    title = 'Queen Terminal';
+                    text = 'Welcome to the Queen\'s terminal.\n\n' +
+                          'You have infinite access to all Black Universe systems.\n\n' +
+                          'Special commands available:\n' +
+                          '• whoami - Display queen status\n' +
+                          '• access - Show clearance level';
+                    break;
+                    
+                // Analytics and reports
+                case 'analytics1':
+                    title = 'System Performance Analytics';
+                    text = 'Current System Status:\n\n' +
+                          'CPU Usage: 23% (Optimal)\n' +
+                          'RAM Usage: 45% (4.5GB/10GB)\n' +
+                          'Disk Usage: 67% (670GB/1TB)\n' +
+                          'Network: 150 Mbps down / 50 Mbps up\n' +
+                          'Uptime: 99.99% (30 days)';
+                    break;
+                    
+                case 'analytics2':
+                    title = 'Security Metrics';
+                    text = 'Security Status:\n\n' +
+                          'Firewall: ACTIVE\n' +
+                          'Intrusion Attempts Blocked: 6,942\n' +
+                          'Vulnerabilities Patched: 420\n' +
+                          'Security Score: 100%\n' +
+                          'Threat Level: LOW';
+                    break;
+                    
+                case 'report1':
+                    title = 'Monthly Report - February 2026';
+                    text = 'February 2026 Summary:\n\n' +
+                          'Total Operations: 1,337\n' +
+                          'Successful Operations: 1,337\n' +
+                          'Failed Attempts: 0\n' +
+                          'New Vulnerabilities Found: 69\n' +
+                          'Patches Deployed: 42\n' +
+                          'Systems Secured: 500+';
+                    break;
+                    
+                case 'report2':
+                    title = 'Vulnerability Assessment';
+                    text = 'Current Vulnerability Status:\n\n' +
+                          'Critical Vulnerabilities: 0 ✓\n' +
+                          'High Severity: 2 (Being patched)\n' +
+                          'Medium Severity: 5 (Scheduled)\n' +
+                          'Low Severity: 12 (Minor)\n\n' +
+                          'All critical vulnerabilities have been patched successfully.';
+                    break;
+                    
+                case 'settings1':
+                    title = 'Profile Settings';
+                    text = 'Configure your profile settings:\n\n' +
+                          '• Display Name: Dann\n' +
+                          '• Email: ****@blackuniverse.com\n' +
+                          '• Theme: Dark Mode\n' +
+                          '• Notifications: Enabled\n' +
+                          '• Language: English';
+                    break;
+                    
+                case 'settings2':
+                    title = 'Security Settings';
+                    text = 'Security Preferences:\n\n' +
+                          '• Two-Factor Authentication: ENABLED\n' +
+                          '• Session Timeout: 30 minutes\n' +
+                          '• Login Alerts: ENABLED\n' +
+                          '• IP Whitelist: Configured\n' +
+                          '• Audit Log: ACTIVE';
+                    break;
+                    
+                default:
+                    title = 'Information';
+                    text = 'No additional information available.';
+            }
+            
+            showModal(title, text);
+            showToast('Loading ' + title + '...');
+        }
+
+        function showStatDetail(stat) {
+            let title = '';
+            let text = '';
+            
+            switch(stat) {
+                case 'operations':
+                    title = 'Operations Completed';
+                    text = 'Total operations: 1,337\n\n' +
+                          'This includes:\n' +
+                          '• 500+ system penetrations\n' +
+                          '• 200+ bug bounties\n' +
+                          '• 69 security assessments\n' +
+                          '• Various other security operations';
+                    break;
+                    
+                case 'systems':
+                    title = 'Systems Managed';
+                    text = 'Currently managing 500+ systems including:\n\n' +
+                          '• Government infrastructure\n' +
+                          '• Corporate networks\n' +
+                          '• Private databases\n' +
+                          '• Banking systems\n' +
+                          '• Healthcare platforms';
+                    break;
+                    
+                case 'age':
+                    title = 'Age Information';
+                    text = 'Dann is 14 years old, making him one of the youngest security engineers in the industry.\n\n' +
+                          '• Started coding at age 9\n' +
+                          '• First bug bounty at age 10\n' +
+                          '• Joined Black Universe at age 12\n' +
+                          '• Became Security Engineer at age 14';
+                    break;
+                    
+                case 'experience':
+                    title = 'Experience';
+                    text = '5+ years of experience in cybersecurity:\n\n' +
+                          '• 2020-2021: Self-taught coding\n' +
+                          '• 2021-2022: Bug bounty hunting\n' +
+                          '• 2022-2023: Black Universe trainee\n' +
+                          '• 2023-2024: Security Engineer';
+                    break;
+                    
+                case 'vulnerabilities':
+                    title = 'Vulnerabilities Found';
+                    text = 'Over 200 vulnerabilities discovered:\n\n' +
+                          '• Critical: 50\n' +
+                          '• High: 80\n' +
+                          '• Medium: 70\n' +
+                          '• Low: 100+\n\n' +
+                          'Total bounties earned: $500,000+';
+                    break;
+                    
+                case 'success':
+                    title = 'Success Rate';
+                    text = '99.9% success rate in all operations.\n\n' +
+                          '• Total operations: 1,337\n' +
+                          '• Successful: 1,336\n' +
+                          '• Failed: 1\n\n' +
+                          'The only failure was due to a power outage.';
+                    break;
+                    
+                case 'rank':
+                    title = 'Indonesia Rank';
+                    text = 'Ranked #1 in Indonesia for cybersecurity.\n\n' +
+                          '• Top 10 in Asia\n' +
+                          '• Top 100 globally\n' +
+                          '• Youngest in top 100 worldwide';
+                    break;
+                    
+                // Serafim stats
+                case 'access':
+                case 'access2':
+                    title = 'Access Level';
+                    text = 'Infinite access to all Black Universe systems.\n\n' +
+                          '• No restrictions\n' +
+                          '• All areas accessible\n' +
+                          '• Full administrative privileges';
+                    break;
+                    
+                case 'status':
+                    title = 'Queen Status';
+                    text = 'Serafim holds the highest status in Black Universe.\n\n' +
+                          '• Queen rank\n' +
+                          '• Special privileges\n' +
+                          '• Unlimited authority';
+                    break;
+                    
+                case 'clearance':
+                    title = 'Clearance Level';
+                    text = 'Infinite clearance across all systems.\n\n' +
+                          '• Level: ∞\n' +
+                          '• Access: Complete\n' +
+                          '• Authority: Maximum';
+                    break;
+                    
+                default:
+                    title = 'Statistic';
+                    text = 'Detailed information about this statistic.';
+            }
+            
+            showModal(title, text);
+            showToast('Loading statistics...');
+        }
+
+        function showTimelineDetail(year) {
+            let title = '';
+            let text = '';
+            
+            switch(year) {
+                case 2024:
+                    title = '2024 - Present';
+                    text = 'Security Engineer at Black Universe\n\n' +
+                          '• Managing 500+ systems\n' +
+                          '• Leading security operations\n' +
+                          '• Training new members\n' +
+                          '• Developing security protocols\n' +
+                          '• Incident response coordinator';
+                    break;
+                    
+                case 2023:
+                    title = '2023 - Bug Bounty Hunter';
+                    text = 'Bug Bounty Hunter\n\n' +
+                          '• Found 200+ vulnerabilities\n' +
+                          '• Earned $100,000+ in bounties\n' +
+                          '• Top hunter on multiple platforms\n' +
+                          '• Discovered critical bugs in major companies';
+                    break;
+                    
+                case 2022:
+                    title = '2022 - Joined Black Universe';
+                    text = 'Joined Black Universe\n\n' +
+                          '• Became youngest elite member\n' +
+                          '• Completed advanced training\n' +
+                          '• First major operation: Secured government database\n' +
+                          '• Recognized as prodigy';
+                    break;
+                    
+                case 2021:
+                    title = '2021 - Hackathon Champion';
+                    text = 'Hackathon Champion\n\n' +
+                          '• Won national hackathon at age 11\n' +
+                          '• Defeated 1000+ contestants\n' +
+                          '• Gained national recognition\n' +
+                          '• Invited to join cybersecurity programs';
+                    break;
+                    
+                default:
+                    title = 'Timeline Event';
+                    text = 'No additional information available.';
+            }
+            
+            showModal(title, text);
+            showToast('Loading timeline...');
+        }
+
+        // ========== NAVIGATION ==========
+        function showSection(section, event) {
+            // Update active nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Hide all sections
+            const sections = ['dashboardSection', 'analyticsSection', 'reportsSection', 'settingsSection'];
+            sections.forEach(s => {
+                const el = document.getElementById(s);
+                if (el) el.style.display = 'none';
+            });
+            
+            // Also hide Serafim's sections
+            const sections2 = ['dashboardSection2', 'analyticsSection2', 'reportsSection2', 'settingsSection2'];
+            sections2.forEach(s => {
+                const el = document.getElementById(s);
+                if (el) el.style.display = 'none';
+            });
+            
+            // Show selected section based on active profile
+            const activeProfile = document.querySelector('.profile-page.active');
+            if (activeProfile.id === 'dannProfile') {
+                document.getElementById(section + 'Section').style.display = 'block';
+            } else {
+                document.getElementById(section + 'Section2').style.display = 'block';
+            }
+            
+            showToast('Navigated to ' + section);
+        }
+
+        function scrollToTop() {
+            document.querySelector('.profile-page.active').scrollTop = 0;
+            showToast('Scrolled to top');
+        }
+
+        // ========== REAL TIME CLOCK ==========
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('id-ID', { 
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            document.querySelectorAll('.time-display').forEach(el => {
+                el.innerHTML = `🕐 ${timeString}`;
+            });
+        }
+        
+        setInterval(updateTime, 1000);
+
+        // ========== LOGIN FUNCTION ==========
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (username === "Dann Keren" && password === "Dann Sigma") {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dannProfile').classList.add('active');
+                document.getElementById('serafimProfile').classList.remove('active');
+                errorMsg.innerHTML = '';
+                showToast('Welcome back, Dann!');
+            } 
+            else if (username === "Serafim" && password === "MyBini") {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('serafimProfile').classList.add('active');
+                document.getElementById('dannProfile').classList.remove('active');
+                errorMsg.innerHTML = '';
+                showToast('Welcome, Queen Serafim!');
+            } 
+            else {
+                errorMsg.innerHTML = 'ACCESS DENIED • Invalid credentials';
+                // Shake effect
+                document.querySelector('.login-container').style.animation = 'shake 0.3s';
+                setTimeout(() => {
+                    document.querySelector('.login-container').style.animation = '';
+                }, 300);
+                showToast('Access denied!', 'error');
+            }
+        }
+
+        // ========== LOGOUT FUNCTION ==========
+        function logout() {
+            document.getElementById('dannProfile').classList.remove('active');
+            document.getElementById('serafimProfile').classList.remove('active');
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            showToast('Logged out successfully');
+        }
+
+        // ========== SHAKE ANIMATION ==========
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                50% { transform: translateX(10px); }
+                75% { transform: translateX(-5px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // ========== KEYBOARD SHORTCUTS ==========
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+H for help
+            if (e.ctrlKey && e.key === 'h') {
+                e.preventDefault();
+                showModal('Keyboard Shortcuts', 
+                    'Ctrl+H: Show this help\n' +
+                    'Ctrl+D: Go to Dashboard\n' +
+                    'Ctrl+A: Go to Analytics\n' +
+                    'Ctrl+R: Go to Reports\n' +
+                    'Ctrl+S: Go to Settings\n' +
+                    'ESC: Close modal / Logout\n' +
+                    'Enter: Login (at login page)\n' +
+                    '↑/↓: Scroll timeline');
+                showToast('Help menu opened');
+            }
+            
+            // Ctrl+D to Dashboard
+            if (e.ctrlKey && e.key === 'd' && document.querySelector('.profile-page.active')) {
+                e.preventDefault();
+                const activeProfile = document.querySelector('.profile-page.active');
+                const section = 'dashboard';
+                const event = { target: document.querySelector('.nav-item') };
+                showSection(section, event);
+            }
+            
+            // Ctrl+A to Analytics
+            if (e.ctrlKey && e.key === 'a' && document.querySelector('.profile-page.active')) {
+                e.preventDefault();
+                const activeProfile = document.querySelector('.profile-page.active');
+                const section = 'analytics';
+                const event = { target: document.querySelectorAll('.nav-item')[1] };
+                showSection(section, event);
+            }
+            
+            // Ctrl+R to Reports
+            if (e.ctrlKey && e.key === 'r' && document.querySelector('.profile-page.active')) {
+                e.preventDefault();
+                const activeProfile = document.querySelector('.profile-page.active');
+                const section = 'reports';
+                const event = { target: document.querySelectorAll('.nav-item')[2] };
+                showSection(section, event);
+            }
+            
+            // Ctrl+S to Settings
+            if (e.ctrlKey && e.key === 's' && document.querySelector('.profile-page.active')) {
+                e.preventDefault();
+                const activeProfile = document.querySelector('.profile-page.active');
+                const section = 'settings';
+                const event = { target: document.querySelectorAll('.nav-item')[3] };
+                showSection(section, event);
+            }
+            
+            // Enter key for login
+            if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') {
+                login();
+            }
+            
+            // ESC key
+            if (e.key === 'Escape') {
+                if (modal.classList.contains('active')) {
+                    closeModal();
+                } else if (document.querySelector('.profile-page.active')) {
+                    logout();
+                }
+            }
+        });
+
+        // ========== RANDOM GLITCH EFFECT ==========
+        setInterval(() => {
+            if (Math.random() > 0.95 && document.querySelector('.profile-page.active')) {
+                document.body.style.filter = 'hue-rotate(90deg)';
+                setTimeout(() => {
+                    document.body.style.filter = 'none';
+                }, 200);
+            }
+        }, 10000);
+
+        // ========== RANDOM QUOTES (CONSOLE) ==========
+        const quotes = [
+            "Security is not a product, but a process.",
+            "The only secure system is the one that's powered off.",
+            "Hacking is about creativity, not destruction.",
+            "In the digital world, we are all ghosts.",
+            "Black Universe sees everything.",
+            "With great power comes great responsibility.",
+            "Every system has a vulnerability.",
+            "Stay hidden, stay alive.",
+            "The matrix has you.",
+            "Wake up, Neo..."
+        ];
+        
+        setInterval(() => {
+            if (document.querySelector('.profile-page.active')) {
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                console.log(`%c[BLACK UNIVERSE] ${randomQuote}`, 'color: #ff0000; font-size: 12px; font-weight: bold;');
+            }
+        }, 30000);
+
+        // ========== CLICK OUTSIDE MODAL ==========
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // ========== HOVER EFFECTS ==========
+        document.querySelectorAll('.card, .nav-item, .skill-tag').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                el.style.transform = 'scale(1.02)';
+            });
+            
+            el.addEventListener('mouseleave', () => {
+                el.style.transform = 'scale(1)';
+            });
+        });
+
+        // ========== INITIALIZE CLOCK ==========
+        updateTime();
+    </script>
+</body>
+</html>
